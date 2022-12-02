@@ -1,8 +1,11 @@
 package com.account.loginPage.service;
 
+import com.account.loginPage.exception.DuplicateUserNameExistsException;
+import com.account.loginPage.exception.DuplicateEmailIdExistsException;
 import com.account.loginPage.model.Account;
 import com.account.loginPage.model.LoginCred;
 import com.account.loginPage.repository.AccountRepository;
+import com.account.loginPage.exception.NoSuchAccountExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.expression.spel.ast.NullLiteral;
@@ -17,31 +20,30 @@ public class AccountService  {
     AccountRepository accRepo;
 
     public Account createAccount(Account acc){
-        if(null!=accRepo.findByEmailId(acc.getEmailId()).get()){
-           System.out.println("not valid email..Try again");
-            return null;
-        }
-        else {
-            return accRepo.save(acc);
-        }
+            Account isExisting =accRepo.findById(acc.getUserName()).orElse(null);
+            if(isExisting!=null){
+                throw new DuplicateUserNameExistsException("UserName already present in database..");
+            }
+            Account emailPresent =accRepo.findByEmailId(acc.getEmailId()).orElse(null);
+            if(emailPresent!=null){
+                throw new DuplicateEmailIdExistsException("Email id is not unique");
+            }
+            accRepo.save(acc);
+            return acc;
+
     }
 
     public Boolean isExisting(LoginCred loginCred){
         //Account acc;
-        try {
-            if(null==accRepo.findById(loginCred.getUsername()).get()){
-                System.out.println("id doesn;t exists");
-                return false;
+        System.out.println(loginCred.getUsername()+" ---  "+loginCred.getPassword());
+        Account acc =accRepo.findById(loginCred.getUsername()).orElse(null);
+        System.out.println(acc.getUserName()+"  --  "+acc.getPassword());
+            if(acc==null){
+               throw new NoSuchAccountExistsException("No such account exists");
             }
-            Account acc =accRepo.findById(loginCred.getUsername()).get();
             if(acc.getUserName().equals(loginCred.getUsername()) && acc.getPassword().equals(loginCred.getPassword())){
                 return true;
-            }
 
-        }
-        catch(NoSuchElementException e) {
-            System.out.println(e);
-            return false;
         }
         return false;
     }
@@ -69,5 +71,21 @@ public class AccountService  {
             return String.format("exception caught");
         }
         return "";
+    }
+
+    public String updateAccountData(Account acc){
+        System.out.println(acc.getUserName());
+        Account account=accRepo.findById(acc.getUserName()).orElse(null);
+        if(account==null){
+            throw new NoSuchAccountExistsException("No Such Account Exists");
+        }
+        else {
+            account.setName(acc.getName());
+            account.setPassword(acc.getPassword());
+            account.setEmailId(acc.getEmailId());
+            account.setUserName(acc.getUserName());
+            accRepo.save(account);
+            return String.format("The account details updated successfully");
+        }
     }
 }

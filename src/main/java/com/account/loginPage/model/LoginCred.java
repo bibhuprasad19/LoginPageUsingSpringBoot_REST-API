@@ -3,12 +3,11 @@ package com.account.loginPage.model;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.Getter;
 import lombok.Setter;
-@Getter
-@Setter
+
 public class LoginCred {
     private String username;
     private String password;
-/**
+    public LoginCred(){}
     public String getUsername() {
         return username;
     }
@@ -23,5 +22,5 @@ public class LoginCred {
 
     public void setPassword(String password) {
         this.password = password;
-    }  */
+    }
 }

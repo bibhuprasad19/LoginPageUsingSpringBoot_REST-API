@@ -22,25 +22,21 @@ public class AccountController {
 
     @RequestMapping(value = "/create",method= RequestMethod.POST)
     public Account createAccount(@RequestBody Account account){
-        try {
+        System.out.println("   username --  "+account.getName()+"  --  "+account.getPassword()+"  --  "+account.getUserName()+"  --  "+account.getEmailId());
             if (account.getUserName() == null) {
                 System.out.println("userName cannot be empty");
                 return account;
             } else {
                 return accService.createAccount(account);
             }
-        }
-        catch(HttpMessageNotReadableException e){
-            System.out.println(e);
-            return null;
-        }
+
     }
 
     @RequestMapping(value = "/login",method=RequestMethod.GET)
     public String loginAccount(@RequestBody LoginCred loginCred){
         Boolean loginOrNot = accService.isExisting(loginCred);
         if(loginOrNot){
-            return String.format("hello, user Login was successfull");
+            return String.format("hello, user Login was successful");
         }
         return String.format("Incorrect Credentials.. Please try with correct credentials");
     }
@@ -55,5 +51,9 @@ public class AccountController {
     public void deletion(@PathVariable String username,@PathVariable String password){
         accService.delete(username,password);
     }
-
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    public String updateAccount(@RequestBody Account account){
+        String str=accService.updateAccountData(account);
+        return String.format(str);
+    }
 }
