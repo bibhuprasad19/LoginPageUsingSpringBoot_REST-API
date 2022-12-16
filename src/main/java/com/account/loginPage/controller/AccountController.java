@@ -34,9 +34,9 @@ public class AccountController {
 
     @RequestMapping(value = "/login",method=RequestMethod.GET)
     public String loginAccount(@RequestBody LoginCred loginCred){
-        Boolean loginOrNot = accService.isExisting(loginCred);
-        if(loginOrNot){
-            return String.format("hello, user Login was successful");
+        String loginOrNot = accService.isExisting(loginCred);
+        if(loginOrNot!=null){
+            return String.format("hello, user Login was successful !!! Your name and email are --> "+loginOrNot);
         }
         return String.format("Incorrect Credentials.. Please try with correct credentials");
     }

@@ -33,7 +33,7 @@ public class AccountService  {
 
     }
 
-    public Boolean isExisting(LoginCred loginCred){
+    public String isExisting(LoginCred loginCred){
         //Account acc;
         System.out.println(loginCred.getUsername()+" ---  "+loginCred.getPassword());
         Account acc =accRepo.findById(loginCred.getUsername()).orElse(null);
@@ -42,14 +42,18 @@ public class AccountService  {
                throw new NoSuchAccountExistsException("No such account exists");
             }
             if(acc.getUserName().equals(loginCred.getUsername()) && acc.getPassword().equals(loginCred.getPassword())){
-                return true;
-
+                return String.format(acc.getName()+acc.getEmailId());
         }
-        return false;
+        return String.format("//hello//");
     }
     public String details(String user){
-        Account acc = accRepo.findById(user).get();
+        Account acc = accRepo.findById(user).orElse(null);
+        if(acc==null){
+            throw new NoSuchAccountExistsException("No such user found");
+        }
+        else{
         return String.format("hello, "+acc.getName()+" , Your email address is "+acc.getEmailId());
+    }
     }
     public List<Account> findall(){
         return accRepo.findAll();
